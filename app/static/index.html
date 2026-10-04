@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Earth Analog Finder — Oy va Mars analoglari</title>
+
+    <!-- Leaflet (xarita) -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
+    <!-- Chart.js (radar chart) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="" defer></script>
+
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-icon">🪐</span>
+            <div>
+                <h1>Earth Analog Finder</h1>
+                <p>Yerdagi Oy va Marsga o'xshash joylar</p>
+            </div>
+        </div>
+        <div class="actions">
+            <button id="btn-nearest" class="btn" type="button" title="Brauzer joylashuvingizni so'raydi">
+                📍 Menga eng yaqin analog
+            </button>
+            <button id="btn-compare" class="btn btn-accent" type="button">
+                📊 Taqqoslash <span id="compare-count" class="pill">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Filtrlar paneli -->
+    <aside class="filters panel" id="filters">
+        <h2 class="panel-title">Filtrlar</h2>
+
+        <label class="field">
+            <span>Qidiruv</span>
+            <input id="search" type="search" placeholder="Nom yoki tavsif… (masalan: lava)" autocomplete="off" />
+        </label>
+
+        <label class="field">
+            <span>Sayyora</span>
+            <select id="planet">
+                <option value="">Ikkalasi</option>
+                <option value="mars">Mars</option>
+                <option value="moon">Oy</option>
+            </select>
+        </label>
+
+        <label class="field">
+            <span>Joy turi</span>
+            <select id="type">
+                <option value="">Barcha turlar</option>
+                <option value="desert">Cho'l</option>
+                <option value="volcano">Vulqon</option>
+                <option value="cave">G'or</option>
+                <option value="glacier">Muzlik</option>
+                <option value="crater">Krater</option>
+                <option value="other">Boshqa</option>
+            </select>
+        </label>
+
+        <label class="field">
+            <span>Minimal o'xshashlik: <b id="minscore-value">0%</b></span>
+            <input id="minscore" type="range" min="0" max="90" step="5" value="0" />
+        </label>
+
+        <label class="field">
+            <span>Saralash</span>
+            <select id="sort">
+                <option value="score">O'xshashlik bo'yicha</option>
+                <option value="name">Nom bo'yicha</option>
+                <option value="country">Davlat bo'yicha</option>
+                <option value="elevation">Balandlik bo'yicha</option>
+            </select>
+        </label>
+
+        <button id="btn-reset" class="btn btn-ghost" type="button">Filtrlarni tozalash</button>
+
+        <div class="legend">
+            <span><i class="dot dot-moon"></i>Oy</span>
+            <span><i class="dot dot-mars"></i>Mars</span>
+            <span><i class="dot dot-both"></i>Ikkalasi</span>
+        </div>
+
+        <p class="status" id="status">Yuklanmoqda…</p>
+    </aside>
+
+    <!-- Asosiy xarita -->
+    <div id="map" class="map"></div>
+
+    <!-- Yuklanish indikatori -->
+    <div id="loader" class="loader" hidden>
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Batafsil yon panel -->
+    <aside class="detail panel" id="detail" hidden>
+        <button class="close" id="detail-close" type="button" aria-label="Yopish">✕</button>
+        <div class="detail-head">
+            <span class="detail-icon" id="detail-icon">🪐</span>
+            <div>
+                <h2 id="detail-name">—</h2>
+                <p id="detail-meta" class="muted">—</p>
+            </div>
+        </div>
+        <p id="detail-desc" class="desc"></p>
+
+        <div id="detail-badges" class="badges"></div>
+
+        <h3>O'xshashlik</h3>
+        <div id="detail-scores"></div>
+
+        <h3>Sabablar</h3>
+        <ul id="detail-reasons" class="reasons"></ul>
+
+        <a id="detail-source" class="source" href="#" target="_blank" rel="noopener noreferrer" hidden>Manba 🔗</a>
+
+        <div class="detail-actions">
+            <button id="detail-add-compare" class="btn btn-accent" type="button">📊 Taqqoslashga qo'shish</button>
+        </div>
+    </aside>
+
+    <!-- Taqqoslash paneli -->
+    <div class="modal" id="compare-modal" hidden>
+        <div class="modal-box panel">
+            <button class="close" id="compare-close" type="button" aria-label="Yopish">✕</button>
+            <h2 class="panel-title">Taqqoslash (radar chart)</h2>
+            <div class="chips" id="compare-chips"></div>
+            <div class="chart-wrap"><canvas id="radar-chart"></canvas></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" hidden></div>
+
+    <script src="/app.js" defer></script>
+</body>
+</html>
